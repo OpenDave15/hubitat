@@ -12,7 +12,8 @@
  *
  * Credits:
  *
- * Alden Howard (https://github.com/thoward1234/Hubitat-Ambient-Weather): initial implementation
+ * Scott Grayban (https://gitlab.borgnet.us:8443/sgrayban/Hubitat-Ambient-Weather-Improved): improvements
+ * Howard Alden (https://github.com/thoward1234/Hubitat-Ambient-Weather): initial implementation
  *
 */
 
