@@ -18,7 +18,7 @@
 */
 
 metadata {
-  definition(name: "Ambient Weather Outdoor Sensor", namespace: "mircolino", author: "Mirco Caramori") {
+  definition(name: "AmbientWeather Outdoor Sensor", namespace: "mircolino", author: "Mirco Caramori") {
     capability "Temperature Measurement"
     capability "Relative Humidity Measurement"
     capability "Pressure Measurement"
@@ -52,7 +52,6 @@ metadata {
     attribute "wind_direction", "string"
 
     // Light
-    attribute "solarradiation", "number"
     attribute "uv", "number"
   }
 
@@ -82,6 +81,8 @@ def refresh() {
 def setWeather(weather) {
   logger("debug", "Weather: "+weather);
 
+  float temp = 0.0;
+
   // Set Temperature
   sendEvent(name: "temperature", value: weather.tempf, unit: '°F', isStateChange: true);
 
@@ -92,8 +93,6 @@ def setWeather(weather) {
   sendEvent(name: "dewPoint", value: weather.dewPoint, unit:'°F', isStateChange: true);
 
   // Set Comfort Level
-  float temp = 0.0;
-
   temp = (weather.dewPoint - 35);
   if (temp <= 0) {
     temp = 0.0;
@@ -128,46 +127,49 @@ def setWeather(weather) {
   sendEvent(name: "maxdailygust", value: weather.maxdailygust, unit: 'mph', isStateChange: true);
   sendEvent(name: "wind_degree", value: weather.winddir, unit: '°', isStateChange: true);
 
-  temp = weather.winddir
-  if (temp < 22.5) {
-    sendEvent(name:  "wind_direction", value: "North", isStateChange: true);
-    sendEvent(name:  "wind_dir", value: "N", isStateChange: true);
-  }
-  else if (temp < 67.5) {
-    sendEvent(name:  "wind_direction", value: "Northeast", isStateChange: true);
-    sendEvent(name:  "wind_dir", value: "NE", isStateChange: true);
-  }
-  else if (temp < 112.5) {
-    sendEvent(name: "wind_direction", value: "East", isStateChange: true);
-    sendEvent(name:  "wind_dir", value: "E", isStateChange: true);
-  }
-  else if (temp < 157.5) {
-    sendEvent(name: "wind_direction", value: "Southeast", isStateChange: true);
-    sendEvent(name:  "wind_dir", value: "SE", isStateChange: true);
-  }
-  else if (temp < 202.5) {
-    sendEvent(name: "wind_direction", value: "South", isStateChange: true);
-    sendEvent(name:  "wind_dir", value: "S", isStateChange: true);
-  }
-  else if (temp < 247.5) {
-    sendEvent(name: "wind_direction", value: "Southwest", isStateChange: true);
-    sendEvent(name:  "wind_dir", value: "SW", isStateChange: true);
-  }
-  else if (temp < 292.5) {
-    sendEvent(name: "wind_direction", value: "West", isStateChange: true);
-    sendEvent(name:  "wind_dir", value: "W", isStateChange: true);
-  }
-  else if (temp < 337.5) {
-    sendEvent(name: "wind_direction", value: "Northwest", isStateChange: true);
-    sendEvent(name:  "wind_dir", value: "NW", isStateChange: true);
-  }
-  else {
-    sendEvent(name:  "wind_direction", value: "North", isStateChange: true);
-    sendEvent(name:  "wind_dir", value: "N", isStateChange: true);
+  String wind_direction = null;
+  String wind_dir = null;
+
+  if (weather.winddir) {
+    temp = weather.winddir % 360;
+    if (temp >= 337.5 || temp < 22.5) {
+      wind_direction = "North";
+      wind_dir = "N";
+    }
+    else if (temp < 67.5) {
+      wind_direction = "Northeast";
+      wind_dir = "NE";
+    }
+    else if (temp < 112.5) {
+      wind_direction = "East";
+      wind_dir = "E";
+    }
+    else if (temp < 157.5) {
+      wind_direction = "Southeast";
+      wind_dir = "SE";
+    }
+    else if (temp < 202.5) {
+      wind_direction = "South";
+      wind_dir = "S";
+    }
+    else if (temp < 247.5) {
+      wind_direction = "Southwest";
+      wind_dir = "SW";
+    }
+    else if (temp < 292.5) {
+      wind_direction = "West";
+      wind_dir = "W";
+    }
+    else {
+      wind_direction = "Northwest";
+      wind_dir = "NW";
+    }
   }
 
+  sendEvent(name:  "wind_direction", value: wind_direction, isStateChange: true);
+  sendEvent(name:  "wind_dir", value: wind_dir, isStateChange: true);
+
   // UV and Light
-  sendEvent(name: "solarradiation", value: weather.solarradiation, isStateChange: true);
   sendEvent(name: "illuminance", value: weather.solarradiation, isStateChange: true);
   sendEvent(name: "uv", value: weather.uv, isStateChange: true);
 }

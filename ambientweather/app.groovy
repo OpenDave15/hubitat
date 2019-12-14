@@ -16,7 +16,7 @@
  *
 */
 
-definition(name: "Ambient Weather Station", namespace: "mircolino", author: "Mirco Caramori", description: "API to access ambientweather.net", iconUrl: "", iconX2Url: "");
+definition(name: "AmbientWeather Station", namespace: "mircolino", author: "Mirco Caramori", description: "API to access ambientweather.net", iconUrl: "", iconX2Url: "");
 
 // ------------------------------------------------------------
 
@@ -118,8 +118,8 @@ def initialize() {
 // Children ---------------------------------------------------
 
 def addDevices() {
-  addChildDevice("mircolino", "AmbientWeather Outdoor Sensor", "AWTILE-$station", null, [completedSetup: true]);
-  addChildDevice("mircolino", "AmbientWeather Indoor Sensor", "AWTILE-$station", null, [completedSetup: true]);
+  addChildDevice("mircolino", "AmbientWeather Outdoor Sensor", "$station-00", null, [completedSetup: true]);
+  addChildDevice("mircolino", "AmbientWeather Indoor Sensor", "$station-01", null, [completedSetup: true]);
 }
 
 // fetch functions --------------------------------------------
