@@ -22,10 +22,11 @@ definition(name: "AmbientWeather Station", namespace: "mircolino", author: "Mirc
 // ------------------------------------------------------------
 
 preferences {
-  page(name: "page1", title: "Log In", nextPage: "page2", uninstall: true) {
+  page(name: "page1", title: "Settings", nextPage: "page2", uninstall: true) {
     section {
-      input(name: "applicationKey", title: "Application Key", type: "text", required: true);
       input(name: "apiKey", title: "API Key", type: "text", required: true);
+      input(name: "applicationKey", title: "Application Key", type: "text", required: true);
+      input(name: "debugOutput", type: "bool", title: "Enable debug logging?", defaultValue: true);
     }
   }
 
@@ -57,7 +58,7 @@ def page2() {
   return dynamicPage(name: "page2", title: "Select Station", nextPage: "page3", uninstall: true) {
     section {
       input(name: "station", title: "Station", type: "enum", options: stationMacs, required: true);
-      input(name: "refreshInterval", title: "Refresh Interval (in minutes)", type: "number", range: "1..3600", defaultValue: 1, required: true);
+      input(name: "refreshInterval", title: "Refresh Interval (in minutes)", type: "number", range: "1..60", defaultValue: 5, required: true);
     }
   }
 }
@@ -77,33 +78,60 @@ def page3() {
   }
 }
 
+// ------------------------------------------------------------
+
+private logDebug(msg) {
+	if (settings?.debugOutput || settings?.debugOutput == null) {
+		log.debug("$msg");
+	}
+}
+
+// ------------------------------------------------------------
+
+def logDebugOff() {
+  app?.updateSetting("debugOutput",[value:"false",type:"bool"]);
+}
+
 // Lifecycle functions ----------------------------------------
 
 def installed() {
-  log.debug("Installed");
+  logDebug("Installed");
 
-  addDevices();
+  addChildDevice("mircolino", "AmbientWeather Outdoor Sensor", "$station-00", null, [completedSetup: true]);
+  addChildDevice("mircolino", "AmbientWeather Indoor Sensor", "$station-01", null, [completedSetup: true]);
+
   initialize();
-  runEvery5Minutes(fetchNewWeather);
 }
 
 // ------------------------------------------------------------
 
 def updated() {
-  log.debug("Updated");
+  logDebug("Updated");
 
   unsubscribe();
   unschedule();
-  installed();
   initialize();
 }
 
 // ------------------------------------------------------------
 
+def uninstalled() {
+  logDebug("Uninstalled");
+
+  deleteChildDevice("$station-01");
+  deleteChildDevice("$station-00");
+}
+
+// ------------------------------------------------------------
+
 def initialize() {
+  // Disable debug log in 30 minutes
+  if (debugOutput) runIn(1800, logDebugOff);
+
+  // Get the first weather
   fetchNewWeather();
 
-  // Chron schedule, refreshInterval is int
+  // Schedule subsequent weather fetches every X minutes with Cron
   def m = refreshInterval;
   def h = Math.floor(m / 60);
   m -= h * 60;
@@ -111,28 +139,15 @@ def initialize() {
   m = m == 0 ? "*" : "0/" + m.toInteger();
   h = h == 0 ? "*" : "0/" + h.toInteger();
 
-  log.debug("CRON schedule with m: $m and h: $h");
+  logDebug("Cron schedule with m: $m and h: $h");
 
   schedule("0 $m $h * * ? *", fetchNewWeather);
 }
 
-// Children ---------------------------------------------------
-
-def addDevices() {
-  addChildDevice("mircolino", "AmbientWeather Outdoor Sensor", "$station-00", null, [completedSetup: true]);
-  addChildDevice("mircolino", "AmbientWeather Indoor Sensor", "$station-01", null, [completedSetup: true]);
-}
-
-// fetch functions --------------------------------------------
+// Fetch functions --------------------------------------------
 
 def getStations() throws groovyx.net.http.HttpResponseException {
   def data = [];
-
-  def params = [
-    uri: "https://api.ambientweather.net/",
-    path: "/v1/devices",
-    query: [applicationKey: applicationKey, apiKey: apiKey]
-  ];
 
   requestData("/v1/devices", [applicationKey: applicationKey, apiKey: apiKey]) { response ->
     data = response.data;
@@ -167,12 +182,12 @@ def requestData(path, query, code) {
   };
 }
 
-// loop -------------------------------------------------------
+// Loop -------------------------------------------------------
 
 def fetchNewWeather() {
   def weather = getWeather();
 
-  //log.debug("Weather: " + weather);
+  logDebug("Weather: "+weather);
 
   childDevices[0].setWeather(weather);
   childDevices[1].setWeather(weather);

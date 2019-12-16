@@ -54,32 +54,28 @@ metadata {
     // Light
     attribute "uv", "number"
   }
-
-  preferences {
-    section("Preferences") {
-      input "showLogs", "bool", required: false, title: "Show Debug Logs?", defaultValue: false
-    }
-  }
 }
 
 // ------------------------------------------------------------
 
-private logger(type, msg) {
-  if (type && msg && settings?.showLogs) {
-    log."${type}" "${msg}"
-  }
+private logDebug(msg) {
+	if (parent.settings?.debugOutput || parent.settings?.debugOutput == null) {
+		log.debug("$msg");
+	}
 }
 
 // ------------------------------------------------------------
 
 def refresh() {
+  logDebug("Refreshed");
+
   parent.fetchNewWeather();
 }
 
 // ------------------------------------------------------------
 
 def setWeather(weather) {
-  logger("debug", "Weather: "+weather);
+  logDebug("Set Weather");
 
   float temp = 0.0;
 
