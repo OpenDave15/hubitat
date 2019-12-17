@@ -41,7 +41,6 @@ def page2() {
   def stationMacs = [];
   try {
     stations = getStations();
-
     stations.each { stationMacs << it.macAddress };
   }
   catch(groovyx.net.http.HttpResponseException e) {
@@ -53,7 +52,7 @@ def page2() {
     }
   }
 
-  log.debug("Got stations: " + stations);
+  logDebug("Got stations: " + stations);
 
   return dynamicPage(name: "page2", title: "Select Station", nextPage: "page3", uninstall: true) {
     section {
@@ -80,16 +79,24 @@ def page3() {
 
 // ------------------------------------------------------------
 
-private logDebug(msg) {
-	if (settings?.debugOutput || settings?.debugOutput == null) {
-		log.debug("$msg");
-	}
+def boolean isLogDebugOn() {
+	return (settings.debugOutput || settings.debugOutput == null);
 }
 
 // ------------------------------------------------------------
 
 def logDebugOff() {
-  app?.updateSetting("debugOutput",[value:"false",type:"bool"]);
+  log.trace("app: " + app);
+
+  app.updateSetting("debugOutput",[value:"false",type:"bool"]);
+}
+
+// ------------------------------------------------------------
+
+private logDebug(msg) {
+	if (isLogDebugOn()) {
+		log.debug("$msg");
+	}
 }
 
 // Lifecycle functions ----------------------------------------
@@ -125,10 +132,10 @@ def uninstalled() {
 // ------------------------------------------------------------
 
 def initialize() {
-  // Disable debug log in 30 minutes
+  // Turn off debug log in 30 minutes
   if (debugOutput) runIn(1800, logDebugOff);
 
-  // Get the first weather
+  // Get the initial weather
   fetchNewWeather();
 
   // Schedule subsequent weather fetches every X minutes with Cron

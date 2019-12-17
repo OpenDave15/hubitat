@@ -62,7 +62,7 @@ metadata {
 // ------------------------------------------------------------
 
 private logDebug(msg) {
-	if (parent.settings?.debugOutput || parent.settings?.debugOutput == null) {
+	if (parent.isLogDebugOn()) {
 		log.debug("$msg");
 	}
 }
