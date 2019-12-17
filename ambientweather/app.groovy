@@ -1,5 +1,5 @@
 /**
- * IMPORT URL: https://raw.githubusercontent.com/mircolino/hubitat/master/ambientweather/app.groovy
+ * Import URL: https://raw.githubusercontent.com/mircolino/hubitat/master/ambientweather/app.groovy
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at:
@@ -10,12 +10,25 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  * for the specific language governing permissions and limitations under the License.
  *
+ * Version History:
+ *
+ *   v1.0.00:
+ *
+ *   - removed double scheduling from original implementation
+ *   - consolidated log into app
+ *   - added 30 min auto-disable log
+ *   - split device in two (indoor and outdoor sensor) to display appropriate temperature and humidity in two different tiles
+ *
  * Credits:
  *
- * Scott Grayban (https://gitlab.borgnet.us:8443/sgrayban/Hubitat-Ambient-Weather-Improved): improvements
- * Howard Alden (https://github.com/thoward1234/Hubitat-Ambient-Weather): initial implementation
+ *   Scott Grayban (https://gitlab.borgnet.us:8443/sgrayban/Hubitat-Ambient-Weather-Improved): improvements
+ *   Howard Alden (https://github.com/thoward1234/Hubitat-Ambient-Weather): initial implementation
  *
 */
+
+public static String version() { return "v1.0.00"; }
+
+// ------------------------------------------------------------
 
 definition(name: "AmbientWeather Station", namespace: "mircolino", author: "Mirco Caramori", description: "API to access ambientweather.net", iconUrl: "", iconX2Url: "");
 
@@ -26,7 +39,7 @@ preferences {
     section {
       input(name: "apiKey", title: "API Key", type: "text", required: true);
       input(name: "applicationKey", title: "Application Key", type: "text", required: true);
-      input(name: "debugOutput", type: "bool", title: "Enable debug logging?", defaultValue: true);
+      input(name: "debugOutput", type: "bool", title: "Enable debug logging", defaultValue: true);
     }
   }
 
@@ -47,7 +60,7 @@ def page2() {
     // Unauthorized
     return dynamicPage(name: "page2", title: "Error", nextPage: "page1", uninstall: true) {
       section {
-        paragraph("There was an error authorizing you. Please try again.");
+        paragraph("Authorization error. Please try again.");
       }
     }
   }
@@ -86,8 +99,6 @@ def boolean isLogDebugOn() {
 // ------------------------------------------------------------
 
 def logDebugOff() {
-  log.trace("app: " + app);
-
   app.updateSetting("debugOutput",[value:"false",type:"bool"]);
 }
 
