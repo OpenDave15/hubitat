@@ -10,27 +10,23 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  * for the specific language governing permissions and limitations under the License.
  *
- * Version History:
+ * Version History and Credits:
  *
- *   See appplication
- *
- * Credits:
- *
- *   Scott Grayban (https://gitlab.borgnet.us:8443/sgrayban/Hubitat-Ambient-Weather-Improved): improvements
- *   Howard Alden (https://github.com/thoward1234/Hubitat-Ambient-Weather): initial implementation
+ *   See app.groovy
  *
 */
 
 metadata {
   definition(name: "AmbientWeather Indoor Sensor", namespace: "mircolino", author: "Mirco Caramori") {
+    capability "Sensor"
+    capability "Actuator"
+    capability "Refresh"
     capability "Battery"
     capability "Temperature Measurement"
     capability "Relative Humidity Measurement"
     capability "Pressure Measurement"
     capability "Illuminance Measurement"
-    capability "Refresh"
-    capability "Sensor"
-    capability "Actuator"
+    capability "Ultraviolet Index"
 
     // Current Conditions
     attribute "weather", "string"
@@ -38,9 +34,6 @@ metadata {
     attribute "dewPoint", "number"
     attribute "comfort", "number"
     attribute "feelsLike", "number"
-
-    // Indoor Conditions
-    attribute "pressure_indoor", "number"
 
     // Precipitation
     attribute "precip_today", "number"
@@ -58,9 +51,9 @@ metadata {
     attribute "wind_degree", "number"
     attribute "wind_dir", "string"
     attribute "wind_direction", "string"
-
-    // Light
-    attribute "uv", "number"
+        
+    // Indoor Conditions
+    attribute "pressure_indoor", "number"
   }
 }
 
@@ -179,9 +172,9 @@ def setWeather(weather) {
   sendEvent(name:  "wind_direction", value: wind_direction, isStateChange: true);
   sendEvent(name:  "wind_dir", value: wind_dir, isStateChange: true);
 
-  // UV and Light
+  // Light and UV
   sendEvent(name: "illuminance", value: weather.solarradiation, isStateChange: true);
-  sendEvent(name: "uv", value: weather.uv, isStateChange: true);
+  sendEvent(name: "ultravioletIndex", value: weather.uv, isStateChange: true);
 }
 
 // ------------------------------------------------------------

@@ -10,27 +10,21 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  * for the specific language governing permissions and limitations under the License.
  *
- * Version History:
+ * Version History and Credits:
  *
- *   v1.0.05:
- *
- *   - added indoor/outdoor battery level reporting (100: OK, 0: Replace)
- *
- *   v1.0.00:
- *
- *   - removed double scheduling from original implementation
- *   - consolidated log into app
- *   - added 30 min auto-disable log
- *   - split device in two (indoor and outdoor sensor) to display appropriate temperature and humidity in two different tiles
- *
- * Credits:
- *
- *   Scott Grayban (https://gitlab.borgnet.us:8443/sgrayban/Hubitat-Ambient-Weather-Improved): improvements
- *   Howard Alden (https://github.com/thoward1234/Hubitat-Ambient-Weather): initial implementation
+ *   v3.0.05 - added indoor/outdoor battery capability (100: OK, 0: Replace)
+ *           - added ultraviolet index capability
+ *   v3.0.00 - removed double scheduling from original implementation
+ *           - consolidated log into app
+ *           - added 30 min auto-disable log
+ *           - split device in two (indoor and outdoor sensor) to display appropriate temperature and humidity in two different tiles
+ *           - devices created during installation are automatically deleted during uninstallation 
+ *   v2.0.00 - Improvements by Scott Grayban (https://gitlab.borgnet.us:8443/sgrayban/Hubitat-Ambient-Weather-Improved)
+ *   v1.0.00 - Initial implementation by Howard Alden (https://github.com/thoward1234/Hubitat-Ambient-Weather) 
  *
 */
 
-public static String version() { return "v1.0.05"; }
+public static String version() { return "v3.0.05"; }
 
 // ------------------------------------------------------------
 
@@ -61,7 +55,7 @@ def page2() {
     stations.each { stationMacs << it.macAddress };
   }
   catch(groovyx.net.http.HttpResponseException e) {
-    // Unauthorized
+    // Authorization error
     return dynamicPage(name: "page2", title: "Error", nextPage: "page1", uninstall: true) {
       section {
         paragraph("Authorization error. Please try again.");
@@ -150,7 +144,7 @@ def initialize() {
   // Turn off debug log in 30 minutes
   if (debugOutput) runIn(1800, logDebugOff);
 
-  // Get the initial weather
+  // Get initial weather
   fetchNewWeather();
 
   // Schedule subsequent weather fetches every X minutes with Cron
