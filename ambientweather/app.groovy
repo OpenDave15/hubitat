@@ -12,6 +12,10 @@
  *
  * Version History:
  *
+ *   v1.0.05:
+ *
+ *   - added indoor/outdoor battery level reporting (100: OK, 0: Replace)
+ *
  *   v1.0.00:
  *
  *   - removed double scheduling from original implementation
@@ -26,7 +30,7 @@
  *
 */
 
-public static String version() { return "v1.0.00"; }
+public static String version() { return "v1.0.05"; }
 
 // ------------------------------------------------------------
 

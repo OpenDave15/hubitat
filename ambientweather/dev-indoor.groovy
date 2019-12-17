@@ -23,6 +23,7 @@
 
 metadata {
   definition(name: "AmbientWeather Indoor Sensor", namespace: "mircolino", author: "Mirco Caramori") {
+    capability "Battery"
     capability "Temperature Measurement"
     capability "Relative Humidity Measurement"
     capability "Pressure Measurement"
@@ -85,6 +86,9 @@ def setWeather(weather) {
   logDebug("Set Weather");
 
   float temp = 0.0;
+
+  // Set Battery (100: OK, 0: Replace)
+  sendEvent(name: "battery", value: (weather.battin? 100: weather.battin), unit: '%', isStateChange: true);
 
   // Set Temperature
   sendEvent(name: "temperature", value: weather.tempinf, unit: '°F', isStateChange: true);
