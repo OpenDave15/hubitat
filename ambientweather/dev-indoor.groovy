@@ -60,9 +60,9 @@ metadata {
 // ------------------------------------------------------------
 
 private logDebug(msg) {
-	if (parent.isLogDebugOn()) {
-		log.debug("$msg");
-	}
+  if (parent.isLogDebugOn()) {
+    log.debug("$msg");
+  }
 }
 
 // ------------------------------------------------------------

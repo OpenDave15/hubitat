@@ -91,7 +91,7 @@ def page3() {
 // ------------------------------------------------------------
 
 def boolean isLogDebugOn() {
-	return (settings.debugOutput || settings.debugOutput == null);
+  return (settings.debugOutput || settings.debugOutput == null);
 }
 
 // ------------------------------------------------------------
@@ -103,9 +103,9 @@ def logDebugOff() {
 // ------------------------------------------------------------
 
 private logDebug(msg) {
-	if (isLogDebugOn()) {
-		log.debug("$msg");
-	}
+  if (isLogDebugOn()) {
+    log.debug("$msg");
+  }
 }
 
 // Lifecycle functions ----------------------------------------
@@ -134,8 +134,10 @@ def updated() {
 def uninstalled() {
   logDebug("Uninstalled");
 
-  deleteChildDevice("$station-01");
-  deleteChildDevice("$station-00");
+  // Delete all child devices
+  getChildDevices().each {
+    deleteChildDevice(it.deviceNetworkId)
+  }
 }
 
 // ------------------------------------------------------------
