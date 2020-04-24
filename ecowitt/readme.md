@@ -1,2 +1,2 @@
-# Hubitat
-Hubitat Drivers and Applications
+# Ecowitt WiFi Gateway
+Hubitat Driver
