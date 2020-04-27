@@ -97,7 +97,7 @@ int getLogLevel() {
   //   0) log only Errors
   //   1) log Errors and Warnings
   //   2) log Errors, Warnings and Info
-  //   3) log Errors, Warnings, Info and Debug (everythnig)
+  //   3) log Errors, Warnings, Info and Debug (everything)
   //
   // If the level is not yet set in the driver preferences, return a default of 2 (Info)
   // Declared public because it's being used by the child-devices as well
@@ -187,7 +187,7 @@ private void updateStates(Map data) {
       break;
 
     case "PASSKEY":
-      // Eg: passkey = 15CF2C872932F570B34AC469540099A4
+      // Eg: passkey = 11CC2CC72992F570B3BAC468540099AA
       if (state.passkey != it.value) sendEvent(name: "passkey", value: it.value);
       break;
 
